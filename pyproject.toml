@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "shop-api"
+version = "0.1.0"
+description = ""
+authors = ["inessochan <iness0chan@gmail.com>"]
+readme = "README.md"
+packages = [{include = "shop_api"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+flask = "^2.2.2"
+flask-restful = "^0.3.9"
+flask-sqlalchemy = "^3.0.2"
+flask-migrate = "^4.0.0"
+flask-jwt-extended = "^4.4.4"
+marshmallow = "^3.19.0"
+flask-marshmallow = "^0.14.0"
+argon2-cffi = "^21.3.0"
+marshmallow-sqlalchemy = "^0.28.1"
+python-dotenv = "^0.21.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
