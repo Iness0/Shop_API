@@ -1,5 +1,5 @@
 from flask_restful import Resource, Api
-from flask import request, render_template, make_response, Blueprint
+from flask import request, Blueprint
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -10,8 +10,12 @@ from flask_jwt_extended import (
 from models.user import UserModel
 from schemas.user import UserSchema
 from blacklist import BLACKLIST
+from libs.mailgun import MailgunException
+import traceback
+from models.confirmation import ConfirmationModel
 
 USER_ALREADY_EXISTS = "A user with that username already exists."
+EMAIL_ALREADY_EXISTS = "A user with that email already exists."
 CREATED_SUCCESSFULLY = "User created successfully."
 USER_NOT_FOUND = "User not found."
 USER_DELETED = "User deleted."
@@ -20,6 +24,8 @@ USER_LOGGED_OUT = "User <id={user_id}> successfully logged out."
 NOT_CONFIRMED_ERROR = (
     "You have not confirmed registration, please check your email <{}>."
 )
+FAILED_TO_CREATE = "Internal server error, Failed to create user."
+SUCCESS_REGISTER_MESSAGE = "Account created successfully."
 
 user_schema = UserSchema()
 
@@ -32,10 +38,24 @@ class UserRegister(Resource):
 
         if UserModel.find_by_username(user.username):
             return {"message": USER_ALREADY_EXISTS}, 400
+        if UserModel.find_by_email(user.username):
+            return {"message": EMAIL_ALREADY_EXISTS}, 400
         user.password = UserModel.set_password(user.password)
-        user.save_to_db()
+        try:
+            user.save_to_db()
+            confirmation = ConfirmationModel(user.id)
+            confirmation.save_to_db()
 
-        return {"message": CREATED_SUCCESSFULLY}, 201
+            #user.send_confirmation_email()
+            return {"message": SUCCESS_REGISTER_MESSAGE}, 201
+
+        except MailgunException as e:
+            user.delete_from_db()
+            return {"message": str(e)}, 500
+        except:
+            traceback.print_exc()
+            user.delete_from_db()
+            return {"message": FAILED_TO_CREATE}, 500
 
 
 class User(Resource):
@@ -61,12 +81,13 @@ class UserLogin(Resource):
     @classmethod
     def post(cls):
         user_json = request.get_json()
-        user_data = user_schema.load(user_json)
+        user_data = user_schema.load(user_json, partial=("email",))
 
         user = UserModel.find_by_username(user_data.username)
 
         if user and user.validate_password(user_data.password):
-            if user.activated:
+            confirmation = user.most_recent_confirmation
+            if confirmation and confirmation.confirmed:
                 access_token = create_access_token(identity=user.id, fresh=True)
                 refresh_token = create_refresh_token(user.id)
                 return (
@@ -97,22 +118,6 @@ class TokenRefresh(Resource):
         return {"access_token": new_token}, 200
 
 
-class UserConfirm(Resource):
-    @classmethod
-    def get(cls, user_id: int):
-        user = UserModel.find_by_id(user_id)
-        if not user:
-            return {"message": USER_NOT_FOUND}, 404
-
-        user.activated = True
-        user.save_to_db()
-        # return redirect("http://localhost:3000/", code=302)  # redirect if we have a separate web app
-        headers = {"Content-Type": "text/html"}
-        return make_response(
-            render_template("confirmation_page.html", email=user.username), 200, headers
-        )
-
-
 users_api = Blueprint('users', __name__)
 api = Api(users_api)
 api.add_resource(UserRegister, "/register")
@@ -120,4 +125,3 @@ api.add_resource(User, "/user/<int:user_id>")
 api.add_resource(UserLogin, "/login")
 api.add_resource(TokenRefresh, "/refresh")
 api.add_resource(UserLogout, "/logout")
-api.add_resource(UserConfirm, "/user_confirm/<int:user_id>")
