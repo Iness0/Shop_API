@@ -201,6 +201,17 @@ Flask = ">=2.2"
 SQLAlchemy = ">=1.4.18"
 
 [[package]]
+name = "flask-uploads"
+version = "0.2.1"
+description = "Flexible and efficient upload handling for Flask"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Flask = ">=0.8.0"
+
+[[package]]
 name = "greenlet"
 version = "2.0.1"
 description = "Lightweight in-process concurrent programming"
@@ -453,7 +464,7 @@ watchdog = ["watchdog"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "a53791dc58e64f009d0d77a61571746156f46e71e40f14b8260a8351ada36f6f"
+content-hash = "f1b159c46320439bed697c6e4b53fcb9ea1428547c14de0fa8c9ea8fdae99295"
 
 [metadata.files]
 alembic = [
@@ -596,6 +607,9 @@ flask-restful = [
 flask-sqlalchemy = [
     {file = "Flask-SQLAlchemy-3.0.2.tar.gz", hash = "sha256:16199f5b3ddfb69e0df2f52ae4c76aedbfec823462349dabb21a1b2e0a2b65e9"},
     {file = "Flask_SQLAlchemy-3.0.2-py3-none-any.whl", hash = "sha256:7d0cd9cf73e64a996bb881a1ebd01633fc5a6d11c36ea27f7b5e251dc45476e7"},
+]
+flask-uploads = [
+    {file = "Flask-Uploads-0.2.1.tar.gz", hash = "sha256:53ecbd6033667d50ae02b63adebbaa33c7fc56c09e5293025810cf9d841ecb02"},
 ]
 greenlet = [
     {file = "greenlet-2.0.1-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:9ed358312e63bf683b9ef22c8e442ef6c5c02973f0c2a939ec1d7b50c974015c"},

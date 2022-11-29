@@ -5,6 +5,9 @@ from flask_migrate import Migrate
 from ma import ma
 from config import Config
 from blacklist import BLACKLIST
+from libs.image_helper import IMAGE_SET
+from flask_uploads import patch_request_class, configure_uploads
+
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -18,7 +21,9 @@ def create_app():
     db.init_app(app)
     ma.init_app(app)
     jwt.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, render_as_batch=True)
+    patch_request_class(app, Config.MAX_SIZE_IMAGE)
+    configure_uploads(app, IMAGE_SET)
 
     from resources.user import users_api
     app.register_blueprint(users_api)
@@ -26,6 +31,10 @@ def create_app():
     app.register_blueprint(store_api)
     from resources.item import items_api
     app.register_blueprint(items_api)
+    from resources.confirmation import confirmation_api
+    app.register_blueprint(confirmation_api)
+    from resources.image import images_api
+    app.register_blueprint(images_api)
 
     return app
 

@@ -6,7 +6,6 @@ import os
 from libs.mailgun import Mailgun
 from models.confirmation import ConfirmationModel
 
-
 hasher = PasswordHasher()
 MAILGUN_DOMAIN = os.environ.get('MAILGUN_DOMAIN')
 MAILGUN_API_KEY = os.environ.get('MAILGUN_API_KEY')
