@@ -107,6 +107,22 @@ class TokenRefresh(Resource):
         return {"access_token": new_token}, 200
 
 
+class SetPassword(Resource):
+    @classmethod
+    @jwt_required(fresh=True)
+    def post(cls):
+        user_json = request.get_json()
+        data = user_schema.load(user_json)
+        user = UserModel.find_by_username(data.username)
+
+        if not user:
+            return {"message": gettext("user_not_found")}, 400
+        user.password = user.set_password(data.password)
+        user.save_to_db()
+
+        return {"message": gettext("user_password_updated")}, 201
+
+
 users_api = Blueprint('users', __name__)
 api = Api(users_api)
 api.add_resource(UserRegister, "/register")
@@ -114,3 +130,5 @@ api.add_resource(User, "/user/<int:user_id>")
 api.add_resource(UserLogin, "/login")
 api.add_resource(TokenRefresh, "/refresh")
 api.add_resource(UserLogout, "/logout")
+api.add_resource(SetPassword, "/user/password")
+

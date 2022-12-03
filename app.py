@@ -1,15 +1,25 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import MetaData
 from flask_migrate import Migrate
 from ma import ma
 from config import Config
 from blacklist import BLACKLIST
 from libs.image_helper import IMAGE_SET
-from flask_uploads import patch_request_class, configure_uploads
+from flask_uploads import configure_uploads
+from oauth import oauth
 
 
-db = SQLAlchemy()
+meta = MetaData(naming_convention={
+        "ix": "ix_%(column_0_label)s",
+        "uq": "uq_%(table_name)s_%(column_0_name)s",
+        "ck": "ck_%(table_name)s_`%(constraint_name)s`",
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+        "pk": "pk_%(table_name)s"
+      })
+
+db = SQLAlchemy(metadata=meta)
 migrate = Migrate()
 jwt = JWTManager()
 
@@ -21,8 +31,8 @@ def create_app():
     db.init_app(app)
     ma.init_app(app)
     jwt.init_app(app)
+    oauth.init_app(app)
     migrate.init_app(app, db, render_as_batch=True)
-    patch_request_class(app, Config.MAX_SIZE_IMAGE)
     configure_uploads(app, IMAGE_SET)
 
     from resources.user import users_api
@@ -35,11 +45,14 @@ def create_app():
     app.register_blueprint(confirmation_api)
     from resources.image import images_api
     app.register_blueprint(images_api)
+    from resources.git_login import github_api
+    app.register_blueprint(github_api)
+    from resources.order import order_api
+    app.register_blueprint(order_api)
 
     return app
 
 
-# This method will check if a token is blacklisted, and will be called automatically when blacklist is enabled
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blocklist(jwt_header, jwt_payload: dict):
     jti = jwt_payload["jti"]

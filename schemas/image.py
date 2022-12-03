@@ -4,7 +4,7 @@ import typing
 
 
 class FileStorageField(fields.Field):
-    default_error_messages = {{"invalid": "Not a valid image"}}
+    default_error_messages = {"invalid": "Not a valid image"}
 
     def _deserialize(
         self,

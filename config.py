@@ -6,9 +6,9 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY')
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_') or 'sqlite:///' + os.path.join(basedir, 'app.db')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE') or 'sqlite:///' + os.path.join(basedir, 'app.db')
     PROPAGATE_EXCEPTIONS = True
-    MAX_SIZE_IMAGE = 10 * 1024 * 1024
+    MAX_CONTENT_LENGTH = 10 * 1024 * 1024
     UPLOADED_IMAGES_DEST = os.path.join("static", "images")
 
 

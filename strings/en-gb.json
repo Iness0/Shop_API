@@ -28,6 +28,14 @@
   "user_not_confirmed": "You have not confirmed registration, please check your email <{}>.",
   "user_error_creating": "Internal server error. Failed to create user.",
   "user_registered": "Account created successfully, an email with an activation link has been sent to your email address, please check.",
+  "user_password_updated": "Your password has been successfully updated.",
   "image_uploaded": "Image {} has been uploaded successfully",
-  "image_illegal_extension": "Image of {} extension is not allowed"
+  "image_illegal_extension": "Image of {} extension is not allowed",
+  "image_illegal_filename": "Illegal filename '{}' request",
+  "image_not_found": "Image {} not found",
+  "image_deleted": "Image {} has been deleted",
+  "image_deletion_failed": "Image {} couldn't be deleted",
+  "avatar_not_found": "Avatar couldn't be found",
+  "token_failure": "Access to git has been denied",
+  "order_item_by_id_not_found":  "The item in order can't be found"
 }
