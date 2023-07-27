@@ -33,7 +33,7 @@ class Order(Resource):
             items.append(ItemsInOrder(item_id=_id, quantity=count))
 
         order = OrderModel(items=items, status="pending")
-        order.save_to_db()  # this does not submit to Stripe
+        order.save_to_db() 
 
         order.set_status("failed")
         #order.charge(data["token"])
